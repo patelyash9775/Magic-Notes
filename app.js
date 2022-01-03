@@ -1,10 +1,11 @@
- 
+
 //console.log("Welcome to notes app. This is app.js");
 showNotes();
 
 // If user adds a note, add it to the localStorage
 let addBtn = document.getElementById("addBtn");
-addBtn.addEventListener("click", function(e) {
+
+addBtn.addEventListener("click", function (e) {
   let addTxt = document.getElementById("addTxt");
   let notes = localStorage.getItem("notes");
   if (notes == null) {
@@ -13,11 +14,35 @@ addBtn.addEventListener("click", function(e) {
     notesObj = JSON.parse(notes);
   }
   notesObj.push(addTxt.value);
-  localStorage.setItem("notes", JSON.stringify(notesObj));
+  
+ 
+  //   console.log(notesObj);
+
+  let addTitle = document.getElementById("addTitle");
+  let titles = localStorage.getItem("titles");
+  if (titles == null) {
+    titlesObj = [];
+  } else {
+    titlesObj = JSON.parse(titles);
+  }
+  titlesObj.push(addTitle.value);
+  
+  if(addTxt.value!="" && addTitle.value!=""){
+    localStorage.setItem("notes", JSON.stringify(notesObj));
+    localStorage.setItem("titles", JSON.stringify(titlesObj));
+  }
+  else{
+    alert("Please! Add title and notes both");
+  }
+
   addTxt.value = "";
-//   console.log(notesObj);
+  addTitle.value = "";
+  //console.log(titlesObj);
   showNotes();
 });
+
+
+
 
 // Function to show elements from localStorage
 function showNotes() {
@@ -27,17 +52,30 @@ function showNotes() {
   } else {
     notesObj = JSON.parse(notes);
   }
+
+  let titles = localStorage.getItem("titles");
+  
+  if (titles == null) {
+    titlesObj = [];
+  } else {
+    titlesObj = JSON.parse(titles);
+  }
+
   let html = "";
-  notesObj.forEach(function(element, index) {
+
+  for (let index = 0; index < notesObj.length; index++) {
+    let element = notesObj[index];
     html += `
             <div class="noteCard my-2 mx-2 card" style="width: 18rem;">
                     <div class="card-body">
-                        <h5 class="card-title">Note ${index + 1}</h5>
+                        <h5 class="card-title">${titlesObj[index]}</h5>
                         <p class="card-text"> ${element}</p>
                         <button id="${index}"onclick="deleteNote(this.id)" class="btn btn-primary">Delete Note</button>
                     </div>
                 </div>`;
-  });
+
+  }
+
   let notesElm = document.getElementById("notes");
   if (notesObj.length != 0) {
     notesElm.innerHTML = html;
@@ -48,7 +86,7 @@ function showNotes() {
 
 // Function to delete a note
 function deleteNote(index) {
-//   console.log("I am deleting", index);
+  //   console.log("I am deleting", index);
 
   let notes = localStorage.getItem("notes");
   if (notes == null) {
@@ -57,28 +95,38 @@ function deleteNote(index) {
     notesObj = JSON.parse(notes);
   }
 
+  let titles = localStorage.getItem("titles");
+  if (titles == null) {
+    titlesObj = [];
+  } else {
+    titlesObj = JSON.parse(titles);
+  }
+
   notesObj.splice(index, 1);
+  titlesObj.splice(index, 1);
   localStorage.setItem("notes", JSON.stringify(notesObj));
+  localStorage.setItem("titles", JSON.stringify(titlesObj));
   showNotes();
 }
 
 
 let search = document.getElementById('searchTxt');
-search.addEventListener("input", function(){
+search.addEventListener("input", function () {
 
-    let inputVal = search.value.toLowerCase();
-    // console.log('Input event fired!', inputVal);
-    let noteCards = document.getElementsByClassName('noteCard');
-    Array.from(noteCards).forEach(function(element){
-        let cardTxt = element.getElementsByTagName("p")[0].innerText;
-        if(cardTxt.includes(inputVal)){
-            element.style.display = "block";
-        }
-        else{
-            element.style.display = "none";
-        }
-        // console.log(cardTxt);
-    })
+  let inputVal = search.value.toLowerCase();
+  // console.log('Input event fired!', inputVal);
+  let noteCards = document.getElementsByClassName('noteCard');
+  Array.from(noteCards).forEach(function (element) {
+    let cardTxt = element.getElementsByTagName("p")[0].innerText;
+    let cardTitle = element.getElementsByTagName("h5")[0].innerText;
+    if (cardTxt.includes(inputVal) || cardTitle.includes(inputVal)) {
+      element.style.display = "block";
+    }
+    else {
+      element.style.display = "none";
+    }
+    // console.log(cardTxt);
+  })
 })
 
 /*
